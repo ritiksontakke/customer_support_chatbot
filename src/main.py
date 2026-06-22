@@ -1,3 +1,8 @@
-from src.data_ingetions.ingest_csv import *
+from fastapi import FastAPI
+from src.routes.agent_rout import router
 
-print("Customer Support Multi-Agent System Started")
+app = FastAPI(
+    title="coustmer chat bot"
+)
+
+app.include_router(router)

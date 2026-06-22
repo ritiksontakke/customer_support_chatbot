@@ -7,3 +7,7 @@ pandas
 SQLAlchemy
 sqlalchemy 
 psycopg2-binary
+langchain[openai]
+langfuse
+langfuse-langchain
+langchain-core
