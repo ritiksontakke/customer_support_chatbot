@@ -1,0 +1,9 @@
+langchain
+langchain-openai
+langchain-anthropic
+python-dotenv
+fastapi
+pandas
+SQLAlchemy
+sqlalchemy 
+psycopg2-binary
