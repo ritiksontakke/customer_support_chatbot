@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine
 # from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
+from supabase import create_client
+
 import os
 
 # Load environment variables from .env
@@ -28,3 +30,9 @@ try:
         print("Connection successful!")
 except Exception as e:
     print(f"Failed to connect: {e}")
+
+
+supabase = create_client(
+    os.getenv("SUPABASE_URL"),
+    os.getenv("SUPABASE_ANON_KEY")
+)

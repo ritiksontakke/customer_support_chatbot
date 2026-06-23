@@ -2,7 +2,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from src.agents.supervisor_agent import SupervisorAgent
 from langfuse.callback import CallbackHandler
-
+from src.auth.oauth2 import get_current_user
+from fastapi import Depends
 router = APIRouter()
 
 supervior = SupervisorAgent()
@@ -17,7 +18,7 @@ def home():
     return{"messages" : "QueryRequest agent is running"}
 
 @router.post("/supervisor_agent")
-async def execute_agent(request: QueryRequest):
+async def execute_agent(request: QueryRequest , current_user = Depends(get_current_user)):
     handler = CallbackHandler()
 
     result = supervior.invoke(
@@ -26,8 +27,7 @@ async def execute_agent(request: QueryRequest):
                 {
                     "role": "user",
                     "content": f"""
-                    User Email: {request.email}
-
+                    Ticket ID: {request.email}
                     Query: {request.query}
                     """
 
@@ -41,5 +41,7 @@ async def execute_agent(request: QueryRequest):
 
     return{
         "query": request.query,
+        "ticket_id" : request.email,
+        "user" : current_user["username"],
         "response" : result["messages"][-1].content
     }
