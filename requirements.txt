@@ -11,3 +11,5 @@ langchain[openai]
 langfuse
 langfuse-langchain
 langchain-core
+python-jose
+passlib[bcrypt]
