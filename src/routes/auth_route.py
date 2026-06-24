@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
 from src.schemas.schemas import SignupRequest
 from src.config.database import engine
-from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from src.schemas.schemas import LoginRequest
 from src.auth.auth_handler import create_access_token
 router = APIRouter(
     prefix="/auth",
@@ -58,8 +58,9 @@ async def signup(data: SignupRequest):
     
 @router.post("/login",include_in_schema=False)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends()
+    data: OAuth2PasswordRequestForm = Depends()
 ):
+
 
     query = """
     SELECT *
@@ -72,7 +73,7 @@ async def login(
         user = conn.execute(
             text(query),
             {
-                "username": form_data.username
+                "username": data.username,
             }
         ).mappings().first()
 
@@ -84,7 +85,7 @@ async def login(
         )
 
     if not pwd_context.verify(
-        form_data.password,
+        data.password,
         user["password"]
     ):
 
@@ -92,6 +93,11 @@ async def login(
             status_code=401,
             detail="Invalid password"
         )
+    # if data.role != user["role"]:
+    #     raise HTTPException(
+    #         status_code=401,
+    #         detail="Invalid role selected"
+    #     )
 
     access_token = create_access_token(
         {
@@ -104,5 +110,6 @@ async def login(
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+         "role": user["role"]
     }
