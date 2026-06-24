@@ -47,5 +47,7 @@ limit: int = 5
         )
 
         tickets = result.mappings().all()
+    print("EMAIL =", customer_email)
+    print("ROWS =", len(tickets))
 
     return [dict(ticket) for ticket in tickets]

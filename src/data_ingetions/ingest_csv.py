@@ -2,7 +2,7 @@ from src.config.database import engine
 import pandas as pd
 
 df = pd.read_csv(
-    "src/raw_data/customer_support_tickets_200k.csv"
+    "src/raw_data/updated_users_roles_passwords.csv"
 )
 
 print(df.shape)

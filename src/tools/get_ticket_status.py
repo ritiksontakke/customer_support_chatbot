@@ -9,6 +9,7 @@ customer_email: str,
 offset: int = 0,
 limit: int = 5
 ):
+    # customer_email REMOVE | * config -> transfer data || agent to tools | agent to subagent 
     """
     Get the most recent support tickets for an authenticated customer filtered by ticket status.
 

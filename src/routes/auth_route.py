@@ -1,4 +1,5 @@
 from passlib.context import CryptContext
+import hashlib
 from sqlalchemy import text
 from fastapi import APIRouter, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -56,54 +57,41 @@ async def signup(data: SignupRequest):
             detail=str(e)
         )
     
-@router.post("/login",include_in_schema=False)
+@router.post("/login", include_in_schema=False)
 async def login(
     data: OAuth2PasswordRequestForm = Depends()
 ):
 
-
     query = """
     SELECT *
-    FROM users
-    WHERE username = :username
+    FROM customer_support_tickets
+    WHERE customer_email = :customer_email
     """
 
     with engine.begin() as conn:
-
         user = conn.execute(
             text(query),
             {
-                "username": data.username,
+                "customer_email": data.username
             }
         ).mappings().first()
 
     if not user:
-
         raise HTTPException(
             status_code=401,
-            detail="Invalid username"
+            detail="Invalid email"
         )
 
-    if not pwd_context.verify(
-        data.password,
-        user["password"]
-    ):
-
+    # Plain password check
+    if data.password != user["password"]:
         raise HTTPException(
             status_code=401,
             detail="Invalid password"
         )
-    # if data.role != user["role"]:
-    #     raise HTTPException(
-    #         status_code=401,
-    #         detail="Invalid role selected"
-    #     )
 
     access_token = create_access_token(
         {
-            "user_id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
+            "customer_email": user["customer_email"],
             "role": user["role"]
         }
     )
@@ -111,5 +99,6 @@ async def login(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-         "role": user["role"]
+        "customer_email": user["customer_email"],
+        "role": user["role"]
     }

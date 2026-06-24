@@ -20,6 +20,7 @@ def get_current_user(
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
+        print(payload)
 
         return payload
 
