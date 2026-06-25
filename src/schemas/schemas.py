@@ -28,3 +28,4 @@ class LoginRequest(BaseModel):
 @dataclass
 class UserContext:
     customer_email: str
+    role : str
