@@ -30,6 +30,7 @@ def decode_access_token(token: str):
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
+        print (payload)
 
         return payload
 

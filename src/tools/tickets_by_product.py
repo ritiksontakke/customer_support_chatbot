@@ -1,11 +1,13 @@
 from sqlalchemy import text
 from src.config.database import engine
-from langchain.tools import tool
+from langchain.tools import tool,ToolRuntime
+from src.schemas.schemas import UserContext
 
 @tool("GetTicketsByProduct")
 def get_tickets_by_product(
+runtime : ToolRuntime[UserContext],
 product: str,
-customer_email: str,
+# customer_email: str,
 offset: int = 0,
 limit: int = 5
 ):
@@ -26,6 +28,8 @@ limit: int = 5
 
     Returns matching customer tickets.
     """
+    customer_email = runtime.context.customer_email
+    
 
     query = text("""
         SELECT *

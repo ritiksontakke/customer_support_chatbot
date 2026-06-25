@@ -1,11 +1,13 @@
 from sqlalchemy import text
 from src.config.database import engine
-from langchain.tools import tool
+from langchain.tools import tool,ToolRuntime
+from src.schemas.schemas import UserContext
 
 @tool("getTicketDetails")
 def get_ticket_details(
+runtime : ToolRuntime[UserContext],
 ticket_id: str,
-customer_email: str
+# customer_email: str
 ):
     """
     Get complete details for a specific customer support ticket.
@@ -26,6 +28,7 @@ customer_email: str
 
     Returns a single ticket record.
     """
+    customer_email = runtime.context.customer_email
 
     query = text("""
         SELECT *

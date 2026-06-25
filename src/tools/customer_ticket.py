@@ -1,11 +1,12 @@
 from src.config.database import engine
-from langchain.tools import tool
+from langchain.tools import tool , ToolRuntime
 from sqlalchemy import text
-
+from src.schemas.schemas import UserContext
 
 @tool("getTicketByCustomerEmail")
 def get_tickets_by_customer_email(
-customer_email: str,
+runtime : ToolRuntime[UserContext],
+# customer_email: str,
 offset: int = 0,
 limit: int = 5
 ):
@@ -26,6 +27,7 @@ limit: int = 5
 
     Returns up to 5 tickets by default.
     """
+    customer_email = runtime.context.customer_email
 
     query = text("""
         SELECT *
@@ -35,6 +37,8 @@ limit: int = 5
         LIMIT :limit
         OFFSET :offset
     """)
+
+ 
 
     with engine.connect() as connection:
         result = connection.execute(

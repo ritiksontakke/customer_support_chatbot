@@ -1,5 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, EmailStr, Field
+from dataclasses import dataclass
 
 class Role(str, Enum):
     customer = "customer"
@@ -23,3 +24,7 @@ class LoginRequest(BaseModel):
         ...,
         examples=["customer", "manager", "admin"]
     )
+
+@dataclass
+class UserContext:
+    customer_email: str

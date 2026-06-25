@@ -1,11 +1,13 @@
 from sqlalchemy import text
 from src.config.database import engine
-from langchain.tools import tool
+from langchain.tools import tool , ToolRuntime
+from src.schemas.schemas import UserContext
 
 @tool("GetTicketsByChannel")
 def get_tickets_by_channel(
+runtime : ToolRuntime[UserContext],
 channel: str,
-customer_email: str,
+# customer_email: str,
 offset: int = 0,
 limit: int = 5
 ):
@@ -26,6 +28,7 @@ limit: int = 5
 
     Returns the most recent matching tickets.
     """
+    customer_email = runtime.context.customer_email
 
     query = text("""
         SELECT *
