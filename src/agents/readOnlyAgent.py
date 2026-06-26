@@ -6,14 +6,6 @@ from src.utils import get_system_prompt
 from src.access_control.permissions import ROLE_TOOLS
 from src.access_control.permission_manager import get_allowed_tools
 
-# allowed_tool_names = ROLE_TOOLS["customer"]
-
-# tools = [
-#     ALL_TOOLS[name]
-#     for name in allowed_tool_names
-# ]
-
-
 @tool("readonlyagents")
 def get_read_only_agent(query: str , runtime: ToolRuntime[UserContext]):
     """
