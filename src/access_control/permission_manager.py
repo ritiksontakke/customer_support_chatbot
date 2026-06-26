@@ -4,7 +4,7 @@ from src.access_control.tool_registry import ALL_TOOLS
 
 def get_allowed_tools(role: str):
 
-    tool_names = ROLE_TOOLS.get(role, [])
+    tool_names = ROLE_TOOLS.get(role.lower(), [])
 
     return [
         ALL_TOOLS[name]

@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from dotenv import load_dotenv
 from supabase import create_client
+from sqlalchemy.orm import sessionmaker , declarative_base
 
 import os
 
@@ -23,7 +24,12 @@ engine = create_engine(DATABASE_URL)
 # If using Transaction Pooler or Session Pooler, we want to ensure we disable SQLAlchemy client side pooling -
 # https://docs.sqlalchemy.org/en/20/core/pooling.html#switching-pool-implementations
 # engine = create_engine(DATABASE_URL, poolclass=NullPool)
-
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+Base = declarative_base()
 # Test the connection
 try:
     with engine.connect() as connection:

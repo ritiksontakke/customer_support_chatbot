@@ -1,6 +1,7 @@
-from src.tools.get_ticket_status import (
-    get_tickets_by_customer_email_and_status
-)
+# from src.tools.get_ticket_status import (
+#    get_tickets_by_customer_email_and_status.name:
+#     get_tickets_by_customer_email_and_status,
+# )
 from src.tools.customer_ticket import (
     get_tickets_by_customer_email
 )
