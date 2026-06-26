@@ -49,6 +49,10 @@ async def login(
             status_code=401,
             detail="Invalid email",
         )
+    print("Entered Password:", data.password)
+    print("Password from DB:", user.hashed_password)
+    print("Type:", type(user.hashed_password))
+
 
     if not TicketService.verify_password(
         data.password,

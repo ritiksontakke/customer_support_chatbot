@@ -4,7 +4,9 @@ from src.config.database import SessionLocal
 from src.models.customersupport import CustomerSupportTicket
 from src.repositories.ticket_repository import TicketRepository
 from passlib.context import CryptContext
-
+from sqlalchemy.orm import Session
+import hashlib
+from passlib.exc import UnknownHashError
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -231,9 +233,80 @@ class TicketService:
     @staticmethod
     def verify_password(
         plain_password: str,
-        hashed_password: str,
+        stored_password: str,
     ):
-        return pwd_context.verify(
-            plain_password,
-            hashed_password,
-        )
+        # 1. Plain password
+        if plain_password == stored_password:
+            return True
+
+        # 2. SHA-256 hash
+        sha256_hash = hashlib.sha256(plain_password.encode()).hexdigest()
+        if sha256_hash == stored_password:
+            return True
+
+        # 3. bcrypt hash
+        try:
+            return pwd_context.verify(plain_password, stored_password)
+        except UnknownHashError:
+            return False
+        
+    @staticmethod
+    def update_ticket(
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
+        updates: dict | None = None,
+    ):
+
+        session = SessionLocal()
+
+        try:
+
+            if updates is None:
+                updates = {}
+
+            return TicketRepository.update_ticket(
+                db=session,
+                ticket_id=ticket_id,
+                customer_email=customer_email,
+                updates=updates,
+            )
+
+        except Exception:
+            session.rollback()
+            raise
+
+        finally:
+            session.close()
+    
+    @staticmethod
+    def delete_ticket(
+        db: Session,
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
+    ):
+
+        query = db.query(CustomerSupportTicket)
+
+        if ticket_id is not None:
+            query = query.filter(
+                CustomerSupportTicket.ticket_id == ticket_id
+            )
+
+        elif customer_email is not None:
+            query = query.filter(
+                CustomerSupportTicket.customer_email == customer_email
+            )
+
+        tickets = query.all()
+
+        if not tickets:
+            return 0
+
+        deleted_count = len(tickets)
+
+        for ticket in tickets:
+            db.delete(ticket)
+
+        db.commit()
+
+        return deleted_count

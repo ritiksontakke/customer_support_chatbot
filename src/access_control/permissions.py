@@ -1,9 +1,6 @@
-# src/permissions.py
-
-# src/access_control/permissions.py
-
 ROLE_TOOLS = {
     "customer": [
+        # Read-only
         "getTicketByCustomerEmail",
         "getTicketByCustomerEmailAndStatus",
         "getTicketDetails",
@@ -12,34 +9,25 @@ ROLE_TOOLS = {
     ],
 
     "manager": [
-        # Manager read tools will be added later
+        # Read-only (same as customer)
+        "getTicketByCustomerEmail",
+        "getTicketByCustomerEmailAndStatus",
+        "getTicketDetails",
+        "getTicketsByChannel",
+        "getTicketsByProduct",
     ],
 
     "admin": [
-        # Admin read/write tools will be added later
-    ]
+        # Read-only
+        "getTicketByCustomerEmail",
+        "getTicketByCustomerEmailAndStatus",
+        "getTicketDetails",
+        "getTicketsByChannel",
+        "getTicketsByProduct",
+
+        # Write permissions
+        "getCustomerTicket",
+        "updateTicket",
+        "deleteTicket",
+    ],
 }
-# # src/permissions.py
-
-# ROLE_TOOLS = {
-#     "customer": [
-#         "get_tickets_by_customer_email_and_status",
-#         "get_tickets_by_customer_email",
-#         "get_ticket_details"
-#     ],
-
-#     "manager": [
-#         "get_tickets_by_customer_email_and_status",
-#         "get_tickets_by_customer_email",
-#         "get_ticket_details",
-#         "get_tickets_by_channel"
-#     ],
-
-#     "admin": [
-#         "get_tickets_by_customer_email_and_status",
-#         "get_tickets_by_customer_email",
-#         "get_ticket_details",
-#         "get_tickets_by_channel",
-#         "get_tickets_by_product"
-#     ]
-# }

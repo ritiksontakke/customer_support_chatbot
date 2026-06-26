@@ -155,3 +155,72 @@ class TicketRepository:
         db.refresh(customer)
 
         return customer
+
+    @staticmethod
+    def update_ticket(
+        db: Session,
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
+        updates: dict | None = None,
+    ):
+
+        if updates is None:
+            updates = {}
+
+        query = db.query(CustomerSupportTicket)
+
+        if ticket_id is not None:
+            query = query.filter(
+                CustomerSupportTicket.ticket_id == ticket_id
+            )
+
+        elif customer_email is not None:
+            query = query.filter(
+                CustomerSupportTicket.customer_email == customer_email
+            )
+
+        ticket = query.first()
+
+        if ticket is None:
+            return None
+
+        for field, value in updates.items():
+            if hasattr(ticket, field):
+                setattr(ticket, field, value)
+
+        db.commit()
+        db.refresh(ticket)
+
+        return ticket
+    @staticmethod
+    def delete_ticket(
+        db: Session,
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
+    ):
+
+        query = db.query(CustomerSupportTicket)
+
+        if ticket_id is not None:
+            query = query.filter(
+                CustomerSupportTicket.ticket_id == ticket_id
+            )
+
+        elif customer_email is not None:
+            query = query.filter(
+                CustomerSupportTicket.customer_email == customer_email
+            )
+
+        tickets = query.all()
+
+        if not tickets:
+            return 0
+
+        deleted_count = len(tickets)
+
+        for ticket in tickets:
+            db.delete(ticket)
+
+        db.commit()
+
+        return deleted_count
