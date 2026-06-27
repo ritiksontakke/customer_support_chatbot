@@ -76,8 +76,9 @@ class TicketService:
                 customer_email=customer_email,
                 offset=offset,
                 limit=limit,
+            
             )
-
+            print(">>> getTicketByCustomerEmail CALLED <<<")
         finally:
             session.close()
     
@@ -126,10 +127,9 @@ class TicketService:
 
     @staticmethod
     def get_ticket_details(
-        ticket_id: int,
-        customer_email: str,
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
     ):
-
         session = SessionLocal()
 
         try:
@@ -138,7 +138,6 @@ class TicketService:
                 ticket_id=ticket_id,
                 customer_email=customer_email,
             )
-
         finally:
             session.close()
 
@@ -280,33 +279,16 @@ class TicketService:
     
     @staticmethod
     def delete_ticket(
-        db: Session,
         ticket_id: int | None = None,
         customer_email: str | None = None,
     ):
+        session = SessionLocal()
 
-        query = db.query(CustomerSupportTicket)
-
-        if ticket_id is not None:
-            query = query.filter(
-                CustomerSupportTicket.ticket_id == ticket_id
+        try:
+            return TicketRepository.delete_ticket(
+                db=session,
+                ticket_id=ticket_id,
+                customer_email=customer_email,
             )
-
-        elif customer_email is not None:
-            query = query.filter(
-                CustomerSupportTicket.customer_email == customer_email
-            )
-
-        tickets = query.all()
-
-        if not tickets:
-            return 0
-
-        deleted_count = len(tickets)
-
-        for ticket in tickets:
-            db.delete(ticket)
-
-        db.commit()
-
-        return deleted_count
+        finally:
+            session.close()

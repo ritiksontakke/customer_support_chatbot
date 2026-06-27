@@ -7,7 +7,7 @@ from src.services.ticket_service import TicketService
 @tool("getCustomerTicket")
 def get_customer_ticket(
     runtime: ToolRuntime[UserContext],
-    customer_email: str,
+    customer_email: str | None = None,
     offset: int = 0,
     limit: int = 5,
 ):

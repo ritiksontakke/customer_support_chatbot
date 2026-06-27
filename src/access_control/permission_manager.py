@@ -8,7 +8,7 @@ def get_allowed_tools(role: str):
     """
 
     tool_names = ROLE_TOOLS.get(role.lower(), [])
-
+    print("Allowed tool names:", tool_names)
     return [
         ALL_TOOLS[name]
         for name in tool_names

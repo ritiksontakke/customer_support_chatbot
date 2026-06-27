@@ -27,7 +27,9 @@ class TicketRepository:
 
         return (
             db.query(CustomerSupportTicket)
-            .filter(CustomerSupportTicket.customer_email == customer_email)
+            .filter(
+                CustomerSupportTicket.customer_email.ilike(f"%{customer_email}%")
+            )
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
@@ -80,18 +82,22 @@ class TicketRepository:
     @staticmethod
     def get_ticket_details(
         db: Session,
-        ticket_id: int,
-        customer_email: str,
+        ticket_id: int | None = None,
+        customer_email: str | None = None,
     ):
+        query = db.query(CustomerSupportTicket)
 
-        return (
-            db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.ticket_id == ticket_id,
-                CustomerSupportTicket.customer_email == customer_email,
+        if ticket_id is not None:
+            query = query.filter(
+                CustomerSupportTicket.ticket_id == ticket_id
             )
-            .first()
-        )
+
+        if customer_email is not None:
+            query = query.filter(
+                CustomerSupportTicket.customer_email == customer_email
+            )
+
+        return query.first()
     
     @staticmethod
     def get_tickets_by_product(

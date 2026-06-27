@@ -5,29 +5,70 @@ from src.services.ticket_service import TicketService
 @tool("getTicketDetails")
 def get_ticket_details(
     runtime: ToolRuntime[UserContext],
-    ticket_id: int,
+    ticket_id: int | None = None,
+    customer_email: str | None = None,
 ):
     """
-    Get complete details for a specific customer support ticket.
-
-    Use this tool whenever a customer:
-    - asks for ticket details
-    - provides a ticket ID
-    - asks "Tell me about ticket 101"
-    - asks "Show details for ticket 101"
-    - asks "What is the status of ticket 101?"
+    Retrieve complete details for a support ticket.
 
     This is a READ-ONLY tool.
 
-    The tool searches customer ticket data stored in Supabase and
-    returns complete information for the requested ticket.
+    Authorization Rules
+    -------------------
+    - Admin:
+        Can retrieve ticket details using either ticket ID or customer email.
 
-    Only tickets belonging to the authenticated customer should be returned.
+    - Manager:
+        Can retrieve ticket details using either ticket ID or customer email.
 
-    Returns a single ticket record.
+    - Customer:
+        Can retrieve only their own ticket details. If a customer provides
+        another customer's email address, access is denied.
+
+    Search Criteria
+    ---------------
+    - ticket_id
+    - customer_email
+
+    At least one of the above parameters must be provided.
+
+    Examples
+    --------
+    - Show ticket 101
+    - Show details for ticket 101
+    - Show ticket details for ritiksontakke10@gmail.com
+    - Find ticket using customer email
+
+    Raises
+    ------
+    PermissionError:
+        If a customer attempts to access another customer's ticket.
+
+    ValueError:
+        If neither ticket_id nor customer_email is provided.
     """
+    print("=== getTicketDetails called ===")
+    print("Role:", runtime.context.role)
+    print("Logged in:", runtime.context.customer_email)
+    print("ticket_id:", ticket_id)
+    print("customer_email:", customer_email)
 
-    customer_email = runtime.context.customer_email
+    logged_in_email = str(runtime.context.customer_email).strip().lower()
+    user_role = str(runtime.context.role).strip().lower()
+
+    # Customer authorization
+    if user_role == "customer":
+        # If customer tries to search another email, deny access
+        if (
+            customer_email
+            and customer_email.strip().lower() != logged_in_email
+        ):
+            raise PermissionError(
+                "Access denied. Customers are authorized to access only their own ticket information."
+            )
+
+        # Always use the authenticated email
+        customer_email = logged_in_email
 
     ticket = TicketService.get_ticket_details(
         ticket_id=ticket_id,

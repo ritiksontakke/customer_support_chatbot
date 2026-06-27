@@ -3,62 +3,67 @@ from langchain.tools import tool, ToolRuntime
 from src.schemas.schemas import UserContext
 from src.services.ticket_service import TicketService
 
-
-@tool("DeleteTicket")
+@tool("deleteTicket")
 def delete_ticket(
     runtime: ToolRuntime[UserContext],
     ticket_id: int | None = None,
     customer_email: str | None = None,
 ):
     """
-    Delete customer support tickets.
+    Delete a customer support ticket.
 
-    Description:
-        Permanently deletes customer support ticket records.
+    This tool performs a DELETE operation.
 
-    Permissions:
-        Allowed Roles:
-            - Admin
+    Always use this tool whenever the user requests to:
+    - Delete ticket 2
+    - Delete support ticket 2
+    - Remove ticket 2
+    - Delete ticket ID 2
+    - Delete the ticket for john@gmail.com
+    - Remove the support ticket for john@gmail.com
+    - Permanently delete a ticket
 
-        Not Allowed:
-            - Customer
-            - Support Agent
-            - Manager
-            - Guest
+    Search Criteria
+    ---------------
+    - ticket_id
+    - customer_email
 
-    Access Rules:
-        - Only an Admin can delete tickets.
-        - Admin may delete any customer's ticket.
-        - Admin may delete:
-            • A single ticket using ticket_id.
-            • All tickets belonging to a customer using customer_email.
+    At least one of the above parameters must be provided.
 
-    Args:
-        ticket_id (int, optional):
-            Ticket ID to delete.
+    Authorization
+    -------------
+    - Admin:
+        Authorized to delete any support ticket.
 
-        customer_email (str, optional):
-            Customer email. Deletes all tickets belonging to that customer.
+    - Manager:
+        Not authorized to delete tickets.
 
-    Returns:
-        dict:
-            {
-                "success": True,
-                "deleted_records": 1,
-                "message": "Ticket(s) deleted successfully."
-            }
+    - Customer:
+        Not authorized to delete tickets.
 
-    Raises:
-        PermissionError:
-            If current user is not an Admin.
+    If the authenticated user's role is not "admin",
+    raise:
 
-        ValueError:
-            If no matching ticket exists.
+    PermissionError(
+        "Access denied. Only administrators are authorized to delete support tickets."
+    )
+
+    Never answer a delete request directly.
+    Always invoke this tool first.
     """
+    print("=== deleteTicket CALLED ===")
 
-    if runtime.context.role.lower() != "admin":
+    user_role = str(runtime.context.role).strip().lower()
+
+    # Only Admin can delete tickets
+    if user_role != "admin":
         raise PermissionError(
-            "Only Admin can delete tickets."
+            "Access denied. Only administrators are authorized to delete support tickets."
+        )
+
+    if ticket_id is None and customer_email is None:
+        raise ValueError(
+            "Either 'ticket_id' or 'customer_email' must be provided."
         )
 
     return TicketService.delete_ticket(

@@ -19,23 +19,19 @@ router = APIRouter(
 @router.post("/signup")
 async def signup(data: SignupRequest):
 
-    try:
-
-        return TicketService.signup(
-            customer_name=data.username,
-            customer_email=data.email,
-            issue_description=data.issue_description,
-            product = data.product,
-            password=data.password,
-        )
-
-    except Exception as e:
-
+    if data.role.lower() != "customer":
         raise HTTPException(
-            status_code=400,
-            detail=str(e),
+            status_code=403,
+            detail="Signup is allowed only for customer."
         )
 
+    return TicketService.signup(
+        customer_name=data.username,
+        customer_email=data.email,
+        issue_description=data.issue_description,
+        product=data.product,
+        password=data.password,
+    )
   
 @router.post("/login", include_in_schema=False)
 async def login(
