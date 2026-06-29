@@ -5,7 +5,7 @@ from src.schemas.schemas import UserContext
 from src.utils import get_system_prompt
 from src.access_control.permissions import ROLE_TOOLS
 from src.access_control.permission_manager import get_allowed_tools
-
+from src.memory.store import store
 @tool("readonlyagents")
 def get_read_only_agent(query: str , runtime: ToolRuntime[UserContext]):
     """
@@ -60,6 +60,7 @@ def get_read_only_agent(query: str , runtime: ToolRuntime[UserContext]):
         return f"Permission denied. No tools are available for role '{role}'."
     readonlyagent = create_agent(
         model=get_model(),
+        store=store,
         tools=tools,
         context_schema=UserContext,
         system_prompt=get_system_prompt("cutomer_chatbot"),

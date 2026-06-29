@@ -1,6 +1,6 @@
 from src.access_control.permissions import ROLE_TOOLS
 from src.access_control.tool_registry import ALL_TOOLS
-
+from src.memory.store import store
 
 def get_allowed_tools(role: str):
     """
