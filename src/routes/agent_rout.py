@@ -5,6 +5,9 @@ from langfuse.callback import CallbackHandler
 from src.auth.oauth2 import get_current_user
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.schemas.schemas import UserContext
+import json
+from fastapi.responses import StreamingResponse
+
 router = APIRouter()
 
 supervisor = SupervisorAgent()
@@ -12,6 +15,7 @@ supervisor = SupervisorAgent()
 
 class QueryRequest(BaseModel):
     query: str
+    thread_id: str
 
 
 @router.get("/")
@@ -42,8 +46,10 @@ async def execute_agent(
                 role=current_user["role"]
             ),
             config={
+                "configurable": {"thread_id": request.thread_id},
                 "callbacks": [handler]
-            }
+            },
+        
         )
 
         return {
