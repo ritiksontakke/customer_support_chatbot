@@ -70,3 +70,45 @@ async def execute_agent(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+    
+@router.post("/query")
+async def query(
+    request: QueryRequest,
+    current_user=Depends(get_current_user),
+):
+
+    async def event_generator():
+        handler = CallbackHandler()
+
+        async for chunk in supervisor.astream(
+            {
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": request.query,
+                    }
+                ]
+            },
+            config={
+                "configurable": {
+                    "thread_id": request.thread_id
+                },
+                "callbacks": [handler],
+            },
+            context=UserContext(
+                customer_email=current_user["customer_email"],
+                role=current_user["role"],
+            ),
+            stream_mode=["messages"],
+            version="v2",
+        ):
+
+            token, metadata = chunk["data"]
+
+            if token.text:
+                yield token.text
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/palin",
+    )
