@@ -5,6 +5,7 @@ from src.schemas.schemas import UserContext
 from src.utils import get_system_prompt
 from src.access_control.permissions import ROLE_TOOLS
 from src.access_control.permission_manager import get_allowed_tools
+from langchain.agents.middleware import ModelCallLimitMiddleware
 from src.memory.store import store
 @tool("writeonlyagents")
 def get_write_only_agent(query: str , runtime: ToolRuntime[UserContext]):
@@ -56,6 +57,12 @@ def get_write_only_agent(query: str , runtime: ToolRuntime[UserContext]):
         model=get_model(),
         store=store,
         tools=tools,
+        middleware=[
+            ModelCallLimitMiddleware(
+            thread_limit=10,
+            run_limit=5,
+        ),
+    ],
         context_schema=UserContext,
         system_prompt=get_system_prompt("cutomer_chatbot"),
     )
