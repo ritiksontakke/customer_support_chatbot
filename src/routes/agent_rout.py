@@ -103,7 +103,7 @@ async def query(
             version="v2",
         ):
 
-            token, metadata = chunk["data"]
+            token = chunk["data"]
 
             if token.text:
                 yield token.text
