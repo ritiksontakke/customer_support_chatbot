@@ -105,20 +105,17 @@ class TicketService:
             session.close()
 
     @staticmethod
-    def get_tickets_by_channel(
+    def get_ticket_channels(
         customer_email: str,
-        channel: str,
         offset: int = 0,
         limit: int = 5,
     ):
-
         session = SessionLocal()
 
         try:
-            return TicketRepository.get_tickets_by_channel(
+            return TicketRepository.get_ticket_channels(
                 db=session,
                 customer_email=customer_email,
-                channel=channel,
                 offset=offset,
                 limit=limit,
             )

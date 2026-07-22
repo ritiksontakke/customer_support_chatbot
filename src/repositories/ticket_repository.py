@@ -58,19 +58,16 @@ class TicketRepository:
         )
     
     @staticmethod
-    def get_tickets_by_channel(
+    def get_ticket_channels(
         db: Session,
         customer_email: str,
-        channel: str,
         offset: int = 0,
         limit: int = 5,
     ):
-
         return (
             db.query(CustomerSupportTicket)
             .filter(
                 CustomerSupportTicket.customer_email == customer_email,
-                CustomerSupportTicket.channel == channel,
             )
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
