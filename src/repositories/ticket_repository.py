@@ -94,7 +94,16 @@ class TicketRepository:
                 CustomerSupportTicket.customer_email == customer_email
             )
 
-        return query.first()
+        # If searching by ticket id, return a single ticket
+        if ticket_id is not None:
+            return query.first()
+
+        # Otherwise return latest 5 tickets for the customer
+        return (
+            query.order_by(CustomerSupportTicket.ticket_created_date.desc())
+            .limit(5)
+            .all()
+        )
     
     @staticmethod
     def get_tickets_by_product(
