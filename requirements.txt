@@ -13,3 +13,5 @@ langfuse-langchain
 langchain-core
 python-jose
 passlib[bcrypt]
+streamlit
+requests

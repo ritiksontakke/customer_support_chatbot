@@ -78,9 +78,7 @@ async def query(
 ):
 
     async def event_generator():
-        handler = CallbackHandler()
-
-        async for chunk in supervisor.astream(
+        result = await supervisor.ainvoke(
             {
                 "messages": [
                     {
@@ -92,23 +90,24 @@ async def query(
             config={
                 "configurable": {
                     "thread_id": request.thread_id
-                },
-                "callbacks": [handler],
+                }
             },
             context=UserContext(
                 customer_email=current_user["customer_email"],
                 role=current_user["role"],
             ),
-            stream_mode=["messages"],
-            version="v2",
-        ):
+        )
 
-            token = chunk["data"]
+        messages = result.get("messages", [])
 
-            if token.text:
-                yield token.text
+
+        if messages:
+            ai_message = messages[-1]
+            yield ai_message.content
+        else:
+            yield "No response generated."
 
     return StreamingResponse(
         event_generator(),
-        media_type="text/palin",
+        media_type="text/plain",
     )
