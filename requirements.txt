@@ -16,3 +16,4 @@ passlib[bcrypt]
 streamlit
 requests
 email-validator
+supabase
