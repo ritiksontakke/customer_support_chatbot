@@ -207,6 +207,9 @@ class TicketService:
         session = SessionLocal()
 
         try:
+            print("Password:", password)
+            print("Length:", len(password))
+            print("Type:", type(password))
 
             customer = CustomerSupportTicket(
                 customer_name=customer_name,

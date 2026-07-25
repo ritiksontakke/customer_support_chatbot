@@ -31,14 +31,7 @@ def stream_chat(query, thread_id, token):
     return response
 
 
-def signup(
-    username,
-    email,
-    password,
-    product,
-    issue_description,
-):
-
+def signup(username, email, password, product, issue_description):
     response = requests.post(
         f"{BASE_URL}/auth/signup",
         json={
@@ -52,16 +45,20 @@ def signup(
         },
     )
 
-    if response.status_code == 400:
-        detail = response.json().get("detail", "Signup failed.")
-        raise Exception(detail)
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        try:
+            detail = response.json().get("detail")
+        except Exception:
+            detail = None
 
-    if response.status_code == 403:
-        raise Exception("🚫 Signup is allowed only for customers.")
+        if detail:
+            raise Exception(detail)
 
-    if response.status_code >= 500:
-        raise Exception("⚠️ Server error. Please try again later.")
+        if response.status_code == 500:
+            raise Exception("⚠️ Our server encountered an unexpected error. Please try again in a few moments.")
 
-    response.raise_for_status()
+        raise Exception(f"Request failed (HTTP {response.status_code})")
 
     return response.json()
