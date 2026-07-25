@@ -2,10 +2,6 @@ import requests
 from config import API_BASE_URL
 
 BASE_URL = API_BASE_URL
-<<<<<<< HEAD
-
-=======
->>>>>>> 52a8130 (updated docs str)
 
 def stream_chat(query, thread_id, token):
 
