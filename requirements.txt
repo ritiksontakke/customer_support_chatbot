@@ -5,14 +5,14 @@ python-dotenv
 fastapi
 pandas
 SQLAlchemy
-sqlalchemy 
 psycopg2-binary
 langchain[openai]
 langfuse
 langfuse-langchain
 langchain-core
 python-jose
-passlib[bcrypt]
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 streamlit
 requests
 email-validator
