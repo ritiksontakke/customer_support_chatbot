@@ -39,6 +39,7 @@ def get_read_only_agent(query: str , runtime: ToolRuntime[UserContext]):
     - Show my channels
     - Show Email tickets
     - Show Phone tickets
+    -Show my Product
     - Show the channel ritiksontakke1008@gmail.com
     - Show tickets for patricia@gmail.com
     - What is my ticket status?
@@ -91,6 +92,7 @@ def get_read_only_agent(query: str , runtime: ToolRuntime[UserContext]):
         context_schema=UserContext,
         system_prompt=get_system_prompt("cutomer_chatbot"),
     )
+    print([t.name for t in tools])
 
     result = readonlyagent.invoke({"messages": [{"role" :"user", "content":query}]} , context=runtime.context)
     return result["messages"][-1].content

@@ -5,9 +5,9 @@ from src.services.ticket_service import TicketService
 
 
 @tool("GetTicketStatus")
-def get_tickets_by_customer_email_and_status(
+def get_tickets_status(
     runtime: ToolRuntime[UserContext],
-    status: str,
+    status: Optional[str] = None,
     customer_email: Optional[str] = None,
     offset: int = 0,
     limit: int = 2,
@@ -25,12 +25,10 @@ def get_tickets_by_customer_email_and_status(
     use the authenticated customer's email automatically.
     - If the user provides a Ticket ID, another ticket lookup tool may be used
     to retrieve that specific ticket.
-    - This tool requires a ticket status.
-    - Use the status exactly as provided by the user.
-    - Do NOT modify, normalize, infer, or guess the status.
-    - If the user does not specify a ticket status, ask:
-    "Which ticket status would you like to check? (e.g. Open, Pending, Closed, Resolved)"
-    - Do NOT automatically search across multiple statuses.
+    - Ticket status is OPTIONAL.
+    - If the user specifies a status, use it exactly as provided.
+    - If the user does not specify a status (for example: "Show my tickets" or "Show my ticket status"), retrieve all tickets for the authenticated customer without filtering by status.
+    - Do NOT modify, normalize, infer, or guess a status.
     - Do NOT ask the user to confirm their role or permissions.
     The authenticated role is available in `runtime.context.role`.
     - Authorization is enforced by this tool.
@@ -146,10 +144,11 @@ def get_tickets_by_customer_email_and_status(
             customer_email
             and customer_email.lower() != runtime.context.customer_email.lower()
         ):
-            raise PermissionError(
-                "Access denied. Customers are authorized to view only their own support tickets. "
-                "Please remove the customer email or use your registered account to access your ticket information."
-            )
+            return{
+                "success": False,
+                "message":"Access denied. Customers are authorized to view only their own support tickets. ",
+                "message":"Please remove the customer email or use your registered account to access your ticket information."
+            }
 
         customer_email = runtime.context.customer_email
 

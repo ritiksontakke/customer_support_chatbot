@@ -34,6 +34,25 @@ def get_ticket_details(
 
     3. "Show my ticket details"
        → Returns every ticket for the logged-in email.
+    4. "Show my ticket ID"
+        → Returns only the ticket ID(s) associated with the logged-in email.
+
+    5. "Show my ticket IDs"
+        → Returns only the list of ticket IDs associated with the logged-in email.
+
+    Examples:
+
+        User: Show my ticket ID
+        Response:
+            Ticket IDs:
+            - 101
+            - 105
+
+        User: Show my ticket IDs
+        Response:
+            Ticket IDs:
+            - 101
+            - 105
 
     Not allowed:
 
@@ -105,6 +124,14 @@ def get_ticket_details(
 
         customer_email
             -> Ignore supplied email unless it matches logged-in email.
+            "Show my ticket ID" / "Show my ticket IDs"
+        -> Return only the ticket ID(s) for the logged-in customer.
+
+        No parameters
+            -> Return ALL ticket details of the logged-in customer.
+
+        ticket_id only
+            -> Return that ticket ONLY if it belongs to the logged-in customer.
 
     Admin / Manager:
 
@@ -164,6 +191,17 @@ def get_ticket_details(
         Show my ticket details
 
         Show ticket 105
+        Customer:
+
+        Show my tickets
+
+        Show my ticket details
+
+        Show my ticket ID
+
+        Show my ticket IDs
+
+    Show ticket 105
 
     Admin:
 
@@ -253,8 +291,8 @@ def get_ticket_details(
             }
         )
 
-    # Return single object when searching by ticket id
-    if ticket_id is not None and len(results) == 1:
-        return results[0]
+    # # Return single object when searching by ticket id
+    # if ticket_id is not None and len(results) == 1:
+    #     return results[0]
 
     return results

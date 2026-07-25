@@ -4,8 +4,8 @@ ROLE_TOOLS = {
         "getTicketByCustomerEmail",
         "getTicketByCustomerEmailAndStatus",
         "getTicketDetails",
-        "GetTicketChannels",
-        "GetTicketsByProduct",
+        "GetChannels",
+        "GetProduct",
         "GetTicketStatus",
         "deleteTicket",
         
@@ -17,8 +17,8 @@ ROLE_TOOLS = {
         "getTicketByCustomerEmail",
         "getTicketByCustomerEmailAndStatus",
         "getTicketDetails",
-        "GetTicketChannels",
-        "GetTicketsByProduct",
+        "GetChannels",
+        "GetProduct",
         "GetTicketStatus",
         "deleteTicket",
     ],
@@ -28,8 +28,8 @@ ROLE_TOOLS = {
         "getTicketByCustomerEmail",
         "getTicketByCustomerEmailAndStatus",
         "getTicketDetails",
-        "GetTicketChannels",
-        "GetTicketsByProduct",
+        "GetChannels",
+        "GetProduct",
         "GetTicketStatus",
 
         # Write permissions

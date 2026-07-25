@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import hashlib
 from passlib.exc import UnknownHashError
+from typing import Optional
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -82,21 +83,29 @@ class TicketService:
         finally:
             session.close()
     
+
     @staticmethod
     def get_tickets_by_customer_email_and_status(
         customer_email: str,
-        status: str,
+        status: Optional[str] = None,
         offset: int = 0,
         limit: int = 5,
     ):
-
         session = SessionLocal()
 
         try:
-            return TicketRepository.get_tickets_by_customer_email_and_status(
+            if status:
+                return TicketRepository.get_latest_tickets_by_customer_email(
+                    db=session,
+                    customer_email=customer_email,
+                    status=status,
+                    offset=offset,
+                    limit=limit,
+                )
+
+            return TicketRepository.get_latest_tickets_by_customer_email(
                 db=session,
                 customer_email=customer_email,
-                status=status,
                 offset=offset,
                 limit=limit,
             )
@@ -111,7 +120,6 @@ class TicketService:
         limit: int = 5,
     ):
         session = SessionLocal()
-
         try:
             return TicketRepository.get_ticket_channels(
                 db=session,
@@ -139,9 +147,9 @@ class TicketService:
             session.close()
 
     @staticmethod
-    def get_tickets_by_product(
+    def get_products(
         customer_email: str,
-        product: str,
+        product: str | None = None,
         offset: int = 0,
         limit: int = 5,
     ):
@@ -149,7 +157,7 @@ class TicketService:
         session = SessionLocal()
 
         try:
-            return TicketRepository.get_tickets_by_product(
+            return TicketRepository.get_products(
                 db=session,
                 customer_email=customer_email,
                 product=product,

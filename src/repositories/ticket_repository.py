@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from src.models.customersupport import CustomerSupportTicket
-
+from sqlalchemy import func
 
 class TicketRepository:
 
@@ -35,28 +35,23 @@ class TicketRepository:
             .limit(limit)
             .all()
         )
-    
     @staticmethod
-    def get_tickets_by_customer_email_and_status(
-        db: Session,
+    def get_latest_tickets_by_customer_email(
+        db,
         customer_email: str,
-        status: str,
         offset: int = 0,
         limit: int = 5,
     ):
-
         return (
             db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.customer_email == customer_email,
-                CustomerSupportTicket.status == status,
-            )
+            .filter(CustomerSupportTicket.customer_email == customer_email)
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()
         )
     
+
     @staticmethod
     def get_ticket_channels(
         db: Session,
@@ -66,15 +61,13 @@ class TicketRepository:
     ):
         return (
             db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.customer_email == customer_email,
-            )
+            .filter(CustomerSupportTicket.customer_email == customer_email)
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()
         )
-    
+        
 
     @staticmethod
     def get_ticket_details(
@@ -106,21 +99,24 @@ class TicketRepository:
         )
     
     @staticmethod
-    def get_tickets_by_product(
+    def get_products(
         db: Session,
         customer_email: str,
-        product: str,
+        product: str | None = None,
         offset: int = 0,
         limit: int = 5,
     ):
+        query = db.query(CustomerSupportTicket).filter(
+            CustomerSupportTicket.customer_email == customer_email
+        )
+
+        if product:
+            query = query.filter(
+                CustomerSupportTicket.product.ilike(f"%{product}%")
+            )
 
         return (
-            db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.customer_email == customer_email,
-                CustomerSupportTicket.product == product,
-            )
-            .order_by(CustomerSupportTicket.ticket_created_date.desc())
+            query.order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()

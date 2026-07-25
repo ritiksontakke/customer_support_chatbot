@@ -99,6 +99,8 @@ async def query(
         )
 
         messages = result.get("messages", [])
+        print(messages)
+        print(result)
 
 
         if messages:
