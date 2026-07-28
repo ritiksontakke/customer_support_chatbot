@@ -1,22 +1,11 @@
 from sqlalchemy.orm import Session
 
 from src.models.customersupport import CustomerSupportTicket
-from sqlalchemy import func
+from src.models.user import User
+
 
 class TicketRepository:
 
-    @staticmethod
-    def create_ticket(
-        db: Session,
-        ticket: CustomerSupportTicket,
-    ) -> CustomerSupportTicket:
-
-        db.add(ticket)
-        db.commit()
-        db.refresh(ticket)
-
-        return ticket
-    
     @staticmethod
     def get_tickets_by_customer_email(
         db: Session,
@@ -24,33 +13,32 @@ class TicketRepository:
         offset: int = 0,
         limit: int = 5,
     ):
-
         return (
             db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.customer_email.ilike(f"%{customer_email}%")
-            )
+            .join(User, CustomerSupportTicket.user_id == User.id)
+            .filter(User.email == customer_email)
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()
         )
+
     @staticmethod
     def get_latest_tickets_by_customer_email(
-        db,
+        db: Session,
         customer_email: str,
         offset: int = 0,
         limit: int = 5,
     ):
         return (
             db.query(CustomerSupportTicket)
-            .filter(CustomerSupportTicket.customer_email == customer_email)
+            .join(User, CustomerSupportTicket.user_id == User.id)
+            .filter(User.email == customer_email)
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()
         )
-    
 
     @staticmethod
     def get_ticket_channels(
@@ -61,13 +49,13 @@ class TicketRepository:
     ):
         return (
             db.query(CustomerSupportTicket)
-            .filter(CustomerSupportTicket.customer_email == customer_email)
+            .join(User, CustomerSupportTicket.user_id == User.id)
+            .filter(User.email == customer_email)
             .order_by(CustomerSupportTicket.ticket_created_date.desc())
             .offset(offset)
             .limit(limit)
             .all()
         )
-        
 
     @staticmethod
     def get_ticket_details(
@@ -82,22 +70,21 @@ class TicketRepository:
                 CustomerSupportTicket.ticket_id == ticket_id
             )
 
-        if customer_email is not None:
-            query = query.filter(
-                CustomerSupportTicket.customer_email == customer_email
+        elif customer_email is not None:
+            query = (
+                query.join(User, CustomerSupportTicket.user_id == User.id)
+                .filter(User.email == customer_email)
             )
 
-        # If searching by ticket id, return a single ticket
         if ticket_id is not None:
             return query.first()
 
-        # Otherwise return latest 5 tickets for the customer
         return (
             query.order_by(CustomerSupportTicket.ticket_created_date.desc())
             .limit(5)
             .all()
         )
-    
+
     @staticmethod
     def get_products(
         db: Session,
@@ -106,8 +93,10 @@ class TicketRepository:
         offset: int = 0,
         limit: int = 5,
     ):
-        query = db.query(CustomerSupportTicket).filter(
-            CustomerSupportTicket.customer_email == customer_email
+        query = (
+            db.query(CustomerSupportTicket)
+            .join(User, CustomerSupportTicket.user_id == User.id)
+            .filter(User.email == customer_email)
         )
 
         if product:
@@ -121,48 +110,22 @@ class TicketRepository:
             .limit(limit)
             .all()
         )
-    
+
     @staticmethod
     def get_user_role(
         db: Session,
         customer_email: str,
     ):
-
-        ticket = (
-            db.query(CustomerSupportTicket)
-            .filter(CustomerSupportTicket.customer_email == customer_email)
+        user = (
+            db.query(User)
+            .filter(User.email == customer_email)
             .first()
         )
 
-        if ticket:
-            return ticket.role
+        if user:
+            return user.role
 
         return None
-
-    @staticmethod
-    def get_customer_by_email(
-        db: Session,
-        customer_email: str,
-    ):
-        return (
-            db.query(CustomerSupportTicket)
-            .filter(
-                CustomerSupportTicket.customer_email == customer_email
-            )
-            .first()
-        )
-
-    @staticmethod
-    def create_customer(
-        db: Session,
-        customer: CustomerSupportTicket,
-    ):
-
-        db.add(customer)
-        db.commit()
-        db.refresh(customer)
-
-        return customer
 
     @staticmethod
     def update_ticket(
@@ -171,7 +134,6 @@ class TicketRepository:
         customer_email: str | None = None,
         updates: dict | None = None,
     ):
-
         if updates is None:
             updates = {}
 
@@ -183,8 +145,9 @@ class TicketRepository:
             )
 
         elif customer_email is not None:
-            query = query.filter(
-                CustomerSupportTicket.customer_email == customer_email
+            query = (
+                query.join(User, CustomerSupportTicket.user_id == User.id)
+                .filter(User.email == customer_email)
             )
 
         ticket = query.first()
@@ -200,13 +163,13 @@ class TicketRepository:
         db.refresh(ticket)
 
         return ticket
+
     @staticmethod
     def delete_ticket(
         db: Session,
         ticket_id: int | None = None,
         customer_email: str | None = None,
     ):
-
         query = db.query(CustomerSupportTicket)
 
         if ticket_id is not None:
@@ -215,8 +178,9 @@ class TicketRepository:
             )
 
         elif customer_email is not None:
-            query = query.filter(
-                CustomerSupportTicket.customer_email == customer_email
+            query = (
+                query.join(User, CustomerSupportTicket.user_id == User.id)
+                .filter(User.email == customer_email)
             )
 
         tickets = query.all()
@@ -232,3 +196,33 @@ class TicketRepository:
         db.commit()
 
         return deleted_count
+
+    @staticmethod
+    def get_active_ticket_by_customer_and_product(
+        db: Session,
+        customer_email: str,
+        product: str,
+    ):
+        return (
+            db.query(CustomerSupportTicket)
+            .join(User, CustomerSupportTicket.user_id == User.id)
+            .filter(
+                User.email == customer_email,
+                CustomerSupportTicket.product.ilike(product),
+                CustomerSupportTicket.status.in_(
+                    ["Open", "Pending", "In Progress"]
+                ),
+            )
+            .first()
+        )
+
+    @staticmethod
+    def create_ticket(
+        db: Session,
+        ticket: CustomerSupportTicket,
+    ):
+        db.add(ticket)
+        db.commit()
+        db.refresh(ticket)
+
+        return ticket

@@ -31,17 +31,13 @@ def stream_chat(query, thread_id, token):
     return response
 
 
-def signup(username, email, password, product, issue_description):
+def signup(username, email, password):
     response = requests.post(
         f"{BASE_URL}/auth/signup",
         json={
             "username": username,
             "email": email,
             "password": password,
-            "product": product,
-            "issue_description": issue_description,
-            "status": "Open",
-            "role": "customer",
         },
     )
 

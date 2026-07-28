@@ -1,14 +1,9 @@
-import hashlib
-from sqlalchemy import text
-from fastapi import APIRouter, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+
 from src.schemas.schemas import SignupRequest
-from src.config.database import engine
-from src.services.ticket_service import TicketService
-from src.schemas.schemas import LoginRequest
+from src.services.user_service import UserService
 from src.auth.auth_handler import create_access_token
-from passlib.context import CryptContext
 
 router = APIRouter(
     prefix="/auth",
@@ -19,38 +14,27 @@ router = APIRouter(
 @router.post("/signup")
 async def signup(data: SignupRequest):
 
-    if data.role.lower() != "customer":
-        raise HTTPException(
-            status_code=403,
-            detail="Signup is allowed only for customer."
-        )
-
-    return TicketService.signup(
+    return UserService.signup(
         customer_name=data.username,
         customer_email=data.email,
-        issue_description=data.issue_description,
-        product=data.product,
         password=data.password,
     )
-  
+
+
 @router.post("/login", include_in_schema=False)
 async def login(
     data: OAuth2PasswordRequestForm = Depends(),
 ):
 
-    user = TicketService.login(data.username)
+    user = UserService.login(data.username)
 
     if user is None:
         raise HTTPException(
             status_code=401,
             detail="Invalid email",
         )
-    print("Entered Password:", data.password)
-    print("Password from DB:", user.hashed_password)
-    print("Type:", type(user.hashed_password))
 
-
-    if not TicketService.verify_password(
+    if not UserService.verify_password(
         data.password,
         user.hashed_password,
     ):
@@ -61,7 +45,8 @@ async def login(
 
     access_token = create_access_token(
         {
-            "customer_email": user.customer_email,
+            "customer_email": user.email,
+            "customer_name": user.name,
             "role": user.role,
         }
     )
@@ -69,6 +54,7 @@ async def login(
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "customer_email": user.customer_email,
+        "customer_email": user.email,
+        "customer_name": user.name, 
         "role": user.role,
     }

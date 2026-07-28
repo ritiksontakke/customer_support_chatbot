@@ -28,13 +28,9 @@ def register(
     username,
     email,
     password,
-    product,
-    issue_description,
 ):
     return signup(
         username,
         email,
         password,
-        product,
-        issue_description,
     )

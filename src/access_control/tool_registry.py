@@ -7,6 +7,7 @@ from src.tools.admin_customer_ticket import get_customer_ticket
 from src.tools.get_ticket_status import get_tickets_status
 from src.tools.update_ticket import update_ticket
 from src.tools.delete_ticket import delete_ticket
+from src.tools.create_ticket import create_ticket_by_customer
 
 ALL_TOOLS = {
     get_product.name: get_product,
@@ -15,6 +16,8 @@ ALL_TOOLS = {
     get_tickets_status.name: get_tickets_status,
 
     get_customer_ticket.name: get_customer_ticket,
+    create_ticket_by_customer.name: create_ticket_by_customer,
+
 
     update_ticket.name: update_ticket,
     delete_ticket.name: delete_ticket,

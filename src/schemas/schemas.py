@@ -11,13 +11,6 @@ class SignupRequest(BaseModel):
     username: str
     email: EmailStr
     password: str
-    issue_description:str
-    product: str = Field(examples=["Payment Gateway","Mobile App"])
-    status: str = Field(default="Open", examples=["Open"])
-    role: Role = Field(
-        ...,
-        examples=["customer", "manager", "admin"]
-    )
 
 class LoginRequest(BaseModel):
     username: str
@@ -31,4 +24,5 @@ class LoginRequest(BaseModel):
 @dataclass
 class UserContext:
     customer_email: str
+    customer_name: str
     role : str

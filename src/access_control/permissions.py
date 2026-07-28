@@ -8,6 +8,7 @@ ROLE_TOOLS = {
         "GetProduct",
         "GetTicketStatus",
         "deleteTicket",
+        "create_ticket_by_customer",
         
 
     ],

@@ -9,5 +9,4 @@ app = FastAPI(
 app.include_router(auth_router)
 # app.include_router(role_router)
 app.include_router(router)
-
 #uvicorn src.main:app --reload

@@ -43,6 +43,7 @@ async def execute_agent(
             },
             context=UserContext(
                 customer_email=current_user["customer_email"],
+                customer_name=current_user["customer_name"],
                 role=current_user["role"]
             ),
             config={
@@ -55,6 +56,7 @@ async def execute_agent(
         return {
             "query": request.query,
             "customer_email": current_user["customer_email"],
+            "customer_name" :current_user["customer_name"],
             "role": current_user["role"],
             "response": result["messages"][-1].content
         }
@@ -94,6 +96,7 @@ async def query(
             },
             context=UserContext(
                 customer_email=current_user["customer_email"],
+                customer_name=current_user["customer_name"],
                 role=current_user["role"],
             ),
         )

@@ -111,15 +111,6 @@ if not st.session_state.logged_in:
                 type="password",
             )
 
-            product = st.text_input(
-                "Product Name",
-                placeholder="Enter the product/service name"
-            )
-
-            issue_description = st.text_area(
-                "Issue Description"
-            )
-
             signup_btn = st.form_submit_button(
                 "Create Account"
             )
@@ -135,20 +126,12 @@ if not st.session_state.logged_in:
                 elif not signup_password.strip():
                     st.warning("Please enter your password.")
 
-                elif not product.strip():
-                    st.warning("Please enter the product name.")
-
-                elif not issue_description.strip():
-                    st.warning("Please describe your issue.")
-
                 else:
                     try:
                         register(
                             username,
                             signup_email,
                             signup_password,
-                            product,
-                            issue_description,
                         )
 
                         st.success("✅ Account created successfully!")

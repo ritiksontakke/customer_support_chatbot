@@ -1,3 +1,6 @@
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
+
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -63,7 +66,13 @@ class CustomerSupportTicket(Base):
 
     customer_segment = Column(Text)
 
-    role = Column(Text)
+    user_id = Column(
+    BigInteger,
+    ForeignKey("public.users.id"),
+    nullable=True
+    )
 
-    hashed_password = Column(Text)
-    password = Column(Text)
+    user = relationship(
+        "User",
+        back_populates="tickets"
+    )
